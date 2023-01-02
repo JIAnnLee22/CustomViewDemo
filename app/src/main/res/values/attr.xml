@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CustomView">
+        <attr name="show_progress" format="boolean" />
+        <attr name="text_color" format="color" />
+        <attr name="text_size" format="dimension" />
+        <attr name="text_content" format="string" />
+        <attr name="border_width" format="dimension" />
+        <attr name="border_bg_color" format="color" />
+        <attr name="border_fg_color" format="color" />
+        <attr name="progress_max" format="integer" />
+        <attr name="progress_cur" format="integer" />
+    </declare-styleable>
+</resources>
