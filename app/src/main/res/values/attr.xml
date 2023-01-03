@@ -13,4 +13,15 @@
         <attr name="progress_max" format="integer" />
         <attr name="progress_cur" format="integer" />
     </declare-styleable>
+
+    <declare-styleable name="NetworkDashboard">
+        <attr name="percent" format="integer"/>
+    </declare-styleable>
+
+    <declare-styleable name="TasksView">
+        <attr name="task_size" format="integer" />
+        <attr name="task_progress" format="integer" />
+        <attr name="task_ic_normal" format="reference" />
+        <attr name="task_ic_done" format="reference" />
+    </declare-styleable>
 </resources>

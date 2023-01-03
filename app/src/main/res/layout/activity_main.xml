@@ -16,28 +16,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <jiannlee22.customviewdemo.CountdownView
-                android:id="@+id/countdown"
+            <jiannlee22.customviewdemo.TasksView
+                android:id="@+id/tasksview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:border_width="10dp"
-                app:progress_cur="0"
-                app:progress_max="100"
-                app:start_angle="90"
-                app:show_text="true"
-                app:text_size="72sp" />
-
-            <jiannlee22.customviewdemo.CountdownView
-                android:id="@+id/countdown1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:border_width="10dp"
-                app:progress_cur="0"
-                app:progress_max="100"
-                app:show_text="true"
-                app:start_angle="135"
-                app:sweep_angle="270"
-                app:text_size="72sp" />
+                app:task_progress="10"
+                app:task_size="19" />
 
         </LinearLayout>
     </ScrollView>
