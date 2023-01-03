@@ -1,26 +1,34 @@
 package jiannlee22.customviewdemo
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
-import kotlin.math.cos
-import kotlin.math.max
 import kotlin.math.min
 
-class CustomView : View {
+class CountdownView : View {
 
     private var mShowProgressText = false
     private var mTextSize = 0F
+    private var mTextColor = Color.BLUE
     private var mBorderWidth = 10F
     private var mBorderBgColor = Color.CYAN
     private var mBorderFgColor = Color.BLUE
     private var mProgressMax = 10
     private var mProgressCur = 0
+    private var mStartAngle = 0F
+    private var mSweepAngle = 360F
 
     private val mPaintArcBg = Paint()
     private val mPaintArcFg = Paint()
     private val mPaintText = Paint()
+
+    private var size: Int = 0
+    private lateinit var rectF: RectF
+    private var textBaseline = 0F
+
+    var textFormat: (Int) -> String = { it.toString() }
 
     constructor(context: Context?) : this(context, null)
 
@@ -30,15 +38,23 @@ class CustomView : View {
         context, attrs, defStyleAttr
     ) {
         val typedArray =
-            context?.theme?.obtainStyledAttributes(attrs, R.styleable.CustomView, defStyleAttr, 0)
+            context?.theme?.obtainStyledAttributes(
+                attrs,
+                R.styleable.CustomView,
+                defStyleAttr,
+                0
+            )
         typedArray?.apply {
-            mShowProgressText = getBoolean(R.styleable.CustomView_show_progress, mShowProgressText)
+            mShowProgressText = getBoolean(R.styleable.CustomView_show_text, mShowProgressText)
             mTextSize = getDimension(R.styleable.CustomView_text_size, mTextSize)
+            mTextColor = getColor(R.styleable.CustomView_text_color, mTextColor)
             mBorderWidth = getDimension(R.styleable.CustomView_border_width, mBorderWidth)
             mBorderBgColor = getColor(R.styleable.CustomView_border_bg_color, mBorderBgColor)
             mBorderFgColor = getColor(R.styleable.CustomView_border_fg_color, mBorderFgColor)
             mProgressMax = getInt(R.styleable.CustomView_progress_max, mProgressMax)
             mProgressCur = getInt(R.styleable.CustomView_progress_cur, mProgressCur)
+            mStartAngle = getFloat(R.styleable.CustomView_start_angle, mStartAngle)
+            mSweepAngle = getFloat(R.styleable.CustomView_sweep_angle, mSweepAngle)
             recycle()
         }
 
@@ -52,33 +68,40 @@ class CustomView : View {
         mPaintArcFg.color = mBorderFgColor
         mPaintArcFg.strokeCap = Paint.Cap.ROUND
 
-        mPaintText.color = mBorderFgColor
+        mPaintText.color = mTextColor
         mPaintText.textSize = mTextSize
         mPaintText.textAlign = Paint.Align.CENTER
     }
 
+    @SuppressLint("DrawAllocation")
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val min = min(getSize(widthMeasureSpec), getSize(heightMeasureSpec))
-        val r = (min - mBorderWidth / 2) / 2
-        val h = r - r * cos(90 * Math.PI / 180 / 2) - 2
-        setMeasuredDimension(min, min - h.toInt())
-    }
-
-    override fun onDraw(canvas: Canvas?) {
-        super.onDraw(canvas)
-        val size = max(width, height)
-        val rectF = RectF(
+        size = min
+        rectF = RectF(
             (mBorderWidth / 2),
             (mBorderWidth / 2),
             (size - mBorderWidth / 2),
             (size - mBorderWidth / 2)
         )
+        val dy =
+            (mPaintText.fontMetricsInt.bottom - mPaintText.fontMetricsInt.top) / 2F - mPaintText.fontMetricsInt.bottom;
+        textBaseline = size / 2F + dy
+        setMeasuredDimension(min, min)
+    }
+
+    @SuppressLint("DrawAllocation")
+    override fun onDraw(canvas: Canvas?) {
+        super.onDraw(canvas)
+        canvas?.drawFilter =
+            PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG);
         mPaintArcBg.color = mBorderBgColor
-        canvas?.drawArc(rectF, 135F, 270F, false, mPaintArcBg)
-        val offset = 270 * mProgressCur.toFloat() / mProgressMax.toFloat()
-        canvas?.drawArc(rectF, 135F, offset, false, mPaintArcFg)
-        canvas?.drawText(mProgressCur.toString(), size / 2F, size / 2F, mPaintText)
+        canvas?.drawArc(rectF, mStartAngle, mSweepAngle, false, mPaintArcBg)
+        val offset = mSweepAngle * mProgressCur.toFloat() / mProgressMax.toFloat()
+        canvas?.drawArc(rectF, mStartAngle, offset, false, mPaintArcFg)
+        if (mShowProgressText) {
+            canvas?.drawText(textFormat.invoke(mProgressCur), size / 2F, textBaseline, mPaintText)
+        }
     }
 
     fun setProgress(progress: Int) {
